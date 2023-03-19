@@ -35,7 +35,7 @@ class UserData(BaseModel):
         arbitrary_types_allowed = True
 
 
-def replyOut(message_id: int, message_segment: MessageSegment | str) -> Message:
+def replyOut(message_id: int, message_segment: MessageSegment or str) -> Message:
     """返回一个回复消息"""
     return MessageSegment.reply(message_id) + message_segment
 
