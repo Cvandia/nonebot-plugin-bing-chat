@@ -8,7 +8,7 @@
 
 # nonebot-plugin-bing-chat
 
-_✨ 一个可以使用新版Bing进行聊天的插件 ✨_
+_✨ 一个可以使用新版Bing进行聊天的插件(适配3.10以下） ✨_
 
 <a href="./LICENSE">
   <img src="https://img.shields.io/github/license/Harry-Jing/nonebot-plugin-bing-chat.svg" alt="license" />
