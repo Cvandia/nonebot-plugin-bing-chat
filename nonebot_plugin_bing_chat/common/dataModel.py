@@ -81,50 +81,25 @@ class BingChatResponse(BaseModel):
 
     @validator('raw')
     def rawValidator(cls, v):
-        match v:
-            case {'item': {'result': {'value': 'Throttled'}}}:
-                logger.error('<Bing账号到达今日请求上限>')
-                raise BingChatAccountReachLimitException('<Bing账号到达今日请求上限>')
-
-            case {
-                'item': {
-                    'result': {'value': 'Success'},
-                    'throttling': {
-                        'numUserMessagesInConversation': num_conver,
-                        'maxNumUserMessagesInConversation': max_conver,
-                    },
-                }
-            } if num_conver > max_conver:
+        if v['item']['result']['value'] == 'Success':
+            num_conver = v['item']['throttling']['numUserMessagesInConversation']
+            max_conver = v['item']['throttling']['maxNumUserMessagesInConversation']
+            if num_conver > max_conver:
                 raise BingChatConversationReachLimitException(
                     f'<达到对话上限>\n最大对话次数：{max_conver}\n你的话次数：{num_conver}'
                 )
-
-            case {
-                'item': {
-                    'result': {'value': 'Success'},
-                    'messages': [
-                        _,
-                        {'hiddenText': hiddenText},
-                    ],
-                }
-            }:
-                raise BingChatResponseException(f'<Bing检测到敏感问题，无法回答>\n{hiddenText}')
-
-            case {
-                'item': {
-                    'result': {'value': 'Success'},
-                    'messages': [
-                        _,
-                        {'text': text},
-                    ],
-                }
-            }:
-                return v
-
-            case _:
-                logger.error('<未知的错误>')
-                raise BingChatResponseException('<未知的错误, 请管理员查看控制台>')
-
+            if 'hiddenText' in v['item']['messages'][1]:
+                raise BingChatResponseException(
+                    f'<Bing检测到敏感问题，无法回答>\n'
+                    f'{v["item"]["messages"][1]["hiddenText"]}'
+                )
+            return v
+        elif v['item']['result']['value'] == 'Throttled':
+            logger.error('<Bing账号到达今日请求上限>')
+            raise BingChatAccountReachLimitException('<Bing账号到达今日请求上限>')
+        else:
+            logger.error('<未知的错误>')
+            raise BingChatResponseException('<未知的错误, 请管理员查看控制台>')
     @property
     def content_simple(self) -> str:
         try:
