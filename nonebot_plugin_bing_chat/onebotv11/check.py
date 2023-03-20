@@ -23,11 +23,11 @@ def CheckIfInList(event: MessageEvent) -> str:
         return '跳过权限检查，发送用户为超级用户'
 
     if isinstance(event, GroupMessageEvent):
-        if isinstance(plugin_config.bingchat_group_filter_mode,filterMode.blacklist):
+        if plugin_config.bingchat_group_filter_mode == filterMode.blacklist:
             if event.group_id in plugin_config.bingchat_group_filter_blacklist:
                 raise BingChatPermissionDeniedException('您没有权限，此群组在黑名单')
 
-        if isinstance(plugin_config.bingchat_group_filter_mode,filterMode.whitelist):
+        if plugin_config.bingchat_group_filter_mode == filterMode.whitelist:
             if event.group_id not in plugin_config.bingchat_group_filter_whitelist:
                 raise BingChatPermissionDeniedException('您没有权限，此群组不在白名单')
 
